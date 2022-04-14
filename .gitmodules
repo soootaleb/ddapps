@@ -1,0 +1,4 @@
+[submodule "example"]
+	path = example
+	url = https://github.com/soootaleb/abcd.git
+	branch = ddapps/integration

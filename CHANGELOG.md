@@ -1,0 +1,72 @@
+# Change Log
+
+## **v1** - 21.10.2021
+
+Initial boilerplate
+
+- 1.4.0 Upgrade operations typing & implement various enhancements
+  - 1.4.0 Deno 1.20.1
+    - (feat) Type operations with .response() / .request() / .notify()
+    - (feat) DDAPPS Sends InitialMessage
+    - (break) Rename EComponent.Node to EComponent.Peer
+    - (fix) Logger better registers different components
+    - (feat) Net always sends EMType.DiscoveryResult, even when not activated
+    - (fix) Register all parents' methods for Messengers
+    - (feat) .send() returns a Promise that completes when all receivers have processed the message & rejects if a component threw an Error
+    - (feat) Use of import map & deno.json tasks
+    - (fix) Components (e.g Monitor) now use the Client to fetch cluster data instead of ClientRequest forwarding
+  - 1.4.1
+    - (feat) DRemotePeerSet.quorum
+    - (feat) DRemotePeerSet.count
+    - (fix) MonGet /ddapps/node/state/peers returns a result
+    - (fix) Set state.net.ready = true when discovery phase is done
+    - (feat) Full use of MDN WebSocket
+    - (fix) Fix double logging of messages on base components
+    - (fix) Updated import_map & tasks
+  - 1.4.2
+    - (feat) Messenger#response & Messenger#notification have optional destination parameter (Api by default)
+  - 1.4.3
+    - (feat) Add mod.ts & removed default exports
+    - (fix) Migration to CircleCI
+    - (feat) Added documentation
+    - (feat) Added integration example & test
+  - 1.4.4
+    - (fix) Fix typing in Messenger.request() response & notification
+    - (feat) Complete overview documentation
+    - (feat) Add E2E::Mon::Set
+  - 1.4.5
+    - (feat) Add the init command to the CLI to bootstrap a ddapps project
+  - 1.5.0
+    - (feat) Remove `token` from user API to track requests
+    - (feat) Add tracing
+    - (feat) Add `expire` on MonWatch operation
+    - (fix) Client correctly closes the WebSocket on ClientResponse
+    - (feat) Use Cliffy global options for CLI
+    - (feat) Add `--trace` on Client & CLI
+  - 1.5.1
+    - (fix) Fix ddappsctl init & other
+  - 1.5.2
+    - (fix) Fix DDAPPS product version
+  - 1.5.3
+    - (feat) Add Messenger.sendLog to send EMType.LogMessage to Logger
+    - (fix) Messenger.shutdown() correctly removeEventListener from parent classes
+  - 1.5.4
+    - (fix) Register custom components for mon watch /ddapps/node/logs
+    - (fix) Lighter client with no dependecy to DDAPPS
+  - 1.5.5
+    - (fix) Fix networking errors
+    - (feature) Add details to `Messenger.sendLog()`
+    - (improvement) Update `Logger.filters` for easier use
+- 1.3.0 Use sets, Deno 1.19 & allow client notification on requests with ops.listen()
+  - 1.3.1 Add DRemotePeerSet MPayload typing
+- 1.2.0 Implement MonSet operation
+  - 1.2.1 Implement latency on peers & clients
+  - 1.2.2 Add CLI crash command
+  - 1.2.3 Add cluster wide MonGet
+- 1.1.0 Add Any message
+  - 1.1.1 Add CLI monset command
+- 1.0.0 Initial commit
+  - 1.0.1 Fix CLI exports
+  - 1.0.2 Fix client import in CLI
+  - 1.0.3 Allow CLI override
+  - 1.0.4 No CLI execution on module import

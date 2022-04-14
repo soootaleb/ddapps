@@ -1,0 +1,220 @@
+version: 2.1
+jobs:
+  InstallDeno:
+    docker:
+      - image: cimg/base:stable-20.04
+    resource_class: small
+    steps:
+      - run:
+          name: Install Deno
+          command: |
+            curl -fsSL https://deno.land/x/install/install.sh | sh
+            mv ~/.deno ~/project/
+            export PATH=$PATH:~/project/.deno/bin/
+            deno upgrade --version 1.20.1
+      - persist_to_workspace:
+          root: ~/project/
+          paths:
+            - .deno/bin/deno
+  TestUnit:
+    docker:
+      - image: cimg/base:stable-20.04
+    resource_class: small
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Execute unit tests
+          command: |
+            export PATH=$PATH:~/project/.deno/bin/
+            deno task --config deno.json test-unit
+  TestIntegration:
+    docker:
+      - image: cimg/base:stable-20.04
+    resource_class: small
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Execute integration tests
+          command: |
+            git submodule sync
+            git submodule update --init --remote
+            export PATH=$PATH:~/project/.deno/bin/
+            deno task --config deno.json test-integration
+  TestCLIInit:
+    docker:
+      - image: cimg/base:stable-20.04
+    resource_class: small
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Execute ddappsctl init command test
+          command: |
+            git submodule sync
+            git submodule update --init --remote
+            export PATH=$PATH:~/project/.deno/bin/
+            deno task --config deno.json test-init
+  DenoBuildServer:
+    docker:
+      - image: cimg/base:stable-20.04
+    resource_class: small
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Compile ddapps server
+          command: |
+            export PATH=$PATH:~/project/.deno/bin/
+            deno task --config deno.json compile-ddapps
+      - persist_to_workspace:
+          root: ~/project/
+          paths:
+            - Dockerfile
+            - ddapps
+      - store_artifacts:
+          path: ~/project/ddapps
+          destination: ddapps
+  DenoBuildCLI:
+    docker:
+      - image: cimg/base:stable-20.04
+    resource_class: small
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Compile ddappsctl CLI
+          command: |
+            export PATH=$PATH:~/project/.deno/bin/
+            deno task --config deno.json compile-cli
+            mv ddappsctl cli/
+      - persist_to_workspace:
+          root: ~/project/
+          paths:
+            - cli/Dockerfile
+            - cli/ddappsctl
+      - store_artifacts:
+          path: ~/project/cli/ddappsctl
+          destination: ddappsctl
+  DockerPackageServer:
+    docker:
+      - image: cimg/base:stable-20.04
+    resource_class: small
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - setup_remote_docker:
+          version: 20.10.11
+      - run:
+          name: Package server Docker image
+          command: |
+            GIT_TAG=$(git tag --points-at HEAD)
+            IMG_TAG=$([ "$GIT_TAG" == "" ] && echo "latest" || echo "$GIT_TAG")
+            echo "Tag is ${IMG_TAG}"
+            docker build -t soootaleb/ddapps:$IMG_TAG --no-cache .
+            docker save -o ddapps.tar soootaleb/ddapps:$IMG_TAG
+      - persist_to_workspace:
+          root: ~/project/
+          paths:
+            - ddapps.tar
+  DockerPackageCLI:
+    docker:
+      - image: cimg/base:stable-20.04
+    resource_class: small
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - setup_remote_docker:
+          version: 20.10.11
+      - run:
+          name: Package CLI Docker image
+          command: |
+            GIT_TAG=$(git tag --points-at HEAD)
+            IMG_TAG=$([ "$GIT_TAG" == "" ] && echo "latest" || echo "$GIT_TAG")
+            echo "Tag is ${IMG_TAG}"
+            docker build -t soootaleb/ddappsctl:$IMG_TAG --no-cache -f cli/Dockerfile .
+            docker save -o ddappsctl.tar soootaleb/ddappsctl:$IMG_TAG
+      - persist_to_workspace:
+          root: ~/project/
+          paths:
+            - ddappsctl.tar
+  DockerPushServer:
+    docker:
+      - image: cimg/base:stable-20.04
+    resource_class: small
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - setup_remote_docker:
+          version: 20.10.11
+      - run:
+          name: Push server Docker image
+          command: |
+            GIT_TAG=$(git tag --points-at HEAD)
+            IMG_TAG=$([ "$GIT_TAG" == "" ] && echo "latest" || echo "$GIT_TAG")
+            echo "Tag is ${IMG_TAG}"
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+            docker load -i ./ddapps.tar
+            docker push soootaleb/ddapps:$IMG_TAG
+  DockerPushCLI:
+    docker:
+      - image: cimg/base:stable-20.04
+    resource_class: small
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - setup_remote_docker:
+          version: 20.10.11
+      - run:
+          name: Push CLI Docker image
+          command: |
+            GIT_TAG=$(git tag --points-at HEAD)
+            IMG_TAG=$([ "$GIT_TAG" == "" ] && echo "latest" || echo "$GIT_TAG")
+            echo "Tag is ${IMG_TAG}"
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+            docker load -i ./ddappsctl.tar
+            docker push soootaleb/ddappsctl:$IMG_TAG
+
+workflows:
+  GeneralWorkflow:
+    jobs:
+      - InstallDeno
+      - TestUnit:
+          requires:
+            - InstallDeno
+      - TestIntegration:
+          requires:
+            - InstallDeno
+      - TestCLIInit:
+          requires:
+            - InstallDeno
+      - DenoBuildServer:
+          requires:
+            - TestUnit
+            - TestIntegration
+      - DenoBuildCLI:
+          requires:
+            - TestUnit
+            - TestIntegration
+      - DockerPackageServer:
+          requires:
+            - DenoBuildServer
+      - DockerPackageCLI:
+          requires:
+            - DenoBuildCLI
+      - DockerPushServer:
+          requires:
+            - DockerPackageServer
+      - DockerPushCLI:
+          requires:
+            - DockerPackageCLI

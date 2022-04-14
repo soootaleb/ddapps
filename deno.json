@@ -1,0 +1,28 @@
+{
+  "importMap": "import_map.json",
+  "tasks": {
+    "start": "deno run --allow-all --unstable main.ts --console-messages partial --debug",
+    "upgrade-cli": "deno task compile-cli && mv ddappsctl /usr/local/bin/ && ddappsctl -V",
+    "test": "deno task test-unit && deno task test-integration && deno task test-e2e",
+    "test-local": "deno task test-unit && deno task test-integration",
+    "test-e2e": "deno test --allow-all --unstable e2e -- -a 192.168.64.2",
+    "test-unit": "deno test --allow-all --unstable tests",
+    "test-integration": "deno test --allow-all --unstable --config example/deno.json example/tests",
+    "test-ci": "deno task test-unit && deno task test-integration && deno task compile-example && deno task test-init",
+    "test-init": "deno task test-init-clean && deno task compile-cli && deno task test-init-init && deno task test-init-run && deno task test-init-clean",
+    "test-init-clean": "(rm -rf my-app || true) && (rm ddappsctl || true)",
+    "test-init-init": "./ddappsctl init --name my-app --ddapps local",
+    "test-init-run": "deno task -c my-app/deno.json compile",
+    "compile": "deno task compile-cli && deno task compile-ddapps",
+    "compile-cli": "deno compile --allow-all --unstable --output ddappsctl --import-map=import_map.json cli/ddapps.ts",
+    "compile-ddapps": "deno compile --allow-all --unstable --output ddapps --import-map=import_map.json main.ts",
+    "compile-example": "deno task --config example/deno.json compile",
+    "build-cli": "docker build -t ddappsctl -f cli/Dockerfile .",
+    "build-ddapps": "docker build -t ddapps ."
+  },
+  "fmt": {
+    "options": {
+      "lineWidth": 180
+    }
+  }
+}
