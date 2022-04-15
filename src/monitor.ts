@@ -63,8 +63,8 @@ export class Monitor<
 
     if (value === "true") v = true;
     else if (value === "false") v = false;
-    else if (isNaN(parseInt(value.toString()))) v = value;
-    else v = parseInt(value.toString());
+    else if (isNaN(parseFloat(value.toString()))) v = value;
+    else v = parseFloat(value.toString());
 
     if (key.startsWith("/deno/") || key.startsWith("/ddapps/node/version")) {
       return "ReadOnlyKey::" + key;
