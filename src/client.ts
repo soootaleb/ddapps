@@ -15,6 +15,8 @@ export class Client<
   public static DEFAULT_SERVER_ADDR = "127.0.0.1";
   public static DEFAULT_SERVER_PORT = 8080;
 
+  private _disconnectOnClientResponse = true;
+
   private _server = {
     addr: Client.DEFAULT_SERVER_ADDR,
     port: Client.DEFAULT_SERVER_PORT,
@@ -62,6 +64,10 @@ export class Client<
 
   public get co(): Promise<this> {
     return this._connection.promise as Promise<this>;
+  }
+
+  public keepalive(): void {
+    this._disconnectOnClientResponse = false;
   }
 
   public disconnect(): void {
@@ -143,7 +149,7 @@ export class Client<
       this._requests[token] = {
         resolve: (v) => {
           resolve(v);
-          this.disconnect();
+          if (this._disconnectOnClientResponse) this.disconnect();
         },
         reject: reject
       }
