@@ -30,14 +30,16 @@ export class Monitor<
   private get(key: string) {
     if (key.startsWith("/deno/")) {
       const [_, __, metric] = key.split("/");
+      const full = {
+        ...JSON.parse(DDAPPS.JSONStr({...Deno.metrics(), ops: undefined})),
+        ...JSON.parse(DDAPPS.JSONStr(Deno.systemMemoryInfo())),
+        loadavg: Deno.loadavg(),
+        hostname: Deno.hostname(),
+        memory: Deno.memoryUsage()
+      }
       return metric
-        ? {
-          ...JSON.parse(DDAPPS.JSONStr(Deno.metrics())),
-          loadavg: Deno.loadavg(),
-          hostname: Deno.hostname(),
-          memory: Deno.memoryUsage()
-        }[metric] || "NoSuchMetric::" + metric
-        : Deno.metrics();
+        ? full[metric] || "NoSuchMetric::" + metric
+        : full;
     } else if (key.startsWith("/ddapps/node/state/")) {
       const path = key.substring("/ddapps/node/state/".length);
       const keys = path.split("/");
