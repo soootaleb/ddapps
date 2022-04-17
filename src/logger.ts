@@ -64,7 +64,7 @@ export class Logger<
       if (this.state.log.console) this.print(message);
 
       for (const logger of this.state.mon.loggers) {
-        const token = (message.payload as unknown as { token?: string }).token || "";
+        const token = (message.payload as unknown as { token?: string })?.token || "";
         // [FIXME] Bug on ClientConnectionClose (sending the notif to a closed socket....)
         if (!this.state.mon.loggers.includes(token)) {
           this.send(EMType.ClientNotification, {
