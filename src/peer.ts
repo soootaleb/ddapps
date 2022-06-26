@@ -11,7 +11,6 @@ import {
   IResponsePayload,
 } from "./operation.ts";
 import { IState } from "./interface.ts";
-import { Logger } from "./logger.ts";
 
 export class Peer<
   ReqPayload extends IRequestPayload = IRequestPayload,

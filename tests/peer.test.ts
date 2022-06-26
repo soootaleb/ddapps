@@ -1,13 +1,12 @@
 import { state } from "../src/state.ts";
 import { Peer } from "../src/peer.ts";
-import {
-  EComponent
-} from "../src/enumeration.ts";
+import { EComponent } from "../src/enumeration.ts";
 import { IMessage, IState } from "../src/interface.ts";
 import { assertEquals } from "std/testing/asserts.ts";
 import { EMType } from "../src/messages.ts";
 import { EOpType } from "../src/operation.ts";
 import { getAssert } from "../src/testing.ts";
+import { DRemotePeer } from "../src/models/remotepeer.model.ts";
 
 const assertMessages = getAssert();
 
@@ -44,7 +43,7 @@ Deno.test("Peer::ClientResponse", async () => {
 
 Deno.test("Peer::DiscoveryResult::Success", async () => {
   const s: IState = {
-    ...state
+    ...state,
   };
 
   const component = new Peer(s);
@@ -55,7 +54,7 @@ Deno.test("Peer::DiscoveryResult::Success", async () => {
     payload: {
       success: true,
       result: "127.0.0.1",
-      source: "http"
+      source: "http",
     },
     source: "Source",
   };
@@ -64,11 +63,11 @@ Deno.test("Peer::DiscoveryResult::Success", async () => {
     {
       type: EMType.PeerConnectionRequest,
       payload: {
-        peerIp: "127.0.0.1"
+        peerIp: "127.0.0.1",
       },
       source: EComponent.Peer,
       destination: EComponent.Net,
-    }
+    },
   ], message);
 
   component.shutdown();
@@ -76,7 +75,7 @@ Deno.test("Peer::DiscoveryResult::Success", async () => {
 
 Deno.test("Peer::DiscoveryResult::NotSuccess", async () => {
   const s: IState = {
-    ...state
+    ...state,
   };
 
   const component = new Peer(s);
@@ -87,7 +86,7 @@ Deno.test("Peer::DiscoveryResult::NotSuccess", async () => {
     payload: {
       success: false,
       result: "127.0.0.1",
-      source: "http"
+      source: "http",
     },
     source: "Source",
   };
@@ -98,7 +97,7 @@ Deno.test("Peer::DiscoveryResult::NotSuccess", async () => {
       payload: { message: `Peer::ReadyAfter::DiscoveryResult::${message.payload.source}` },
       source: EComponent.Peer,
       destination: EComponent.Logger,
-    }
+    },
   ], message);
 
   assertEquals(s.ready, true);
@@ -106,9 +105,43 @@ Deno.test("Peer::DiscoveryResult::NotSuccess", async () => {
   component.shutdown();
 });
 
+Deno.test("Peer::PeerConnectionOpen", async () => {
+  const s: IState = {
+    ...state,
+  };
+
+  s.net.peers.set("127.0.0.1-1", new DRemotePeer("127.0.0.1-1", null as unknown as WebSocket));
+  s.net.peers.set("127.0.0.2-1", new DRemotePeer("127.0.0.2-1", null as unknown as WebSocket));
+
+  const component = new Peer(s);
+
+  const message: IMessage<EMType.PeerConnectionOpen> = {
+    type: EMType.PeerConnectionOpen,
+    destination: EComponent.Peer,
+    payload: {
+      hostname: "127.0.0.1-2",
+      sock: null as unknown as WebSocket,
+    },
+    source: "Source",
+  };
+
+  await assertMessages([
+    {
+      type: EMType.PeerConnectionAccepted,
+      payload: {
+        knownPeers: ["127.0.0.2"],
+      },
+      source: EComponent.Peer,
+      destination: "127.0.0.1-2",
+    },
+  ], message);
+
+  component.shutdown();
+});
+
 /**
  * MISSING
- * 
+ *
  * M - PeerConnectionOpen
  * L - PeerConnectionAccepted
  * L - CallForVoteResponse
