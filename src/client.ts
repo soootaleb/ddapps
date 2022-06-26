@@ -234,7 +234,11 @@ export class Client<
     return this.send(EOpType.Crash, null)
   }
 
-  public listen<T extends keyof ResPayload>(type: T, callback: (message: M<EMType.ClientNotification, ReqPayload, ResPayload>) => void): void  {
+  public listen<T extends keyof ResPayload>(type: T, callback: (message: M<EMType.ClientNotification, ReqPayload, ResPayload>) => void): void {
     this._listeners[type] = callback;
+  }
+
+  public unlisten<T extends keyof ResPayload>(type: T): void {
+    delete this._listeners[type];
   }
 }
