@@ -4,6 +4,31 @@
 
 Initial boilerplate
 
+- 1.5.0
+  - (feat) Remove `token` from user API to track requests
+  - (feat) Add tracing
+  - (feat) Add `expire` on MonWatch operation
+  - (fix) Client correctly closes the WebSocket on ClientResponse
+  - (feat) Use Cliffy global options for CLI
+  - (feat) Add `--trace` on Client & CLI
+  - 1.5.1
+    - (fix) Fix ddappsctl init & other
+  - 1.5.2
+    - (fix) Fix DDAPPS product version
+  - 1.5.3
+    - (feat) Add Messenger.sendLog to send EMType.LogMessage to Logger
+    - (fix) Messenger.shutdown() correctly removeEventListener from parent classes
+  - 1.5.4
+    - (fix) Register custom components for mon watch /ddapps/node/logs
+    - (fix) Lighter client with no dependecy to DDAPPS
+  - 1.5.5
+    - (fix) Fix networking errors
+    - (feature) Add details to `Messenger.sendLog()`
+    - (improvement) Update `Logger.filters` for easier use
+  - 1.5.6
+    - (fix) Fix Peer unknownPeers definition for connecting to a cluster
+    - (feat) Add Peer tests
+    - (fix) Fix state sharing in unit testing (use of() instead of ..state)
 - 1.4.0 Upgrade operations typing & implement various enhancements
   - 1.4.0 Deno 1.20.1
     - (feat) Type operations with .response() / .request() / .notify()
@@ -36,27 +61,6 @@ Initial boilerplate
     - (feat) Add E2E::Mon::Set
   - 1.4.5
     - (feat) Add the init command to the CLI to bootstrap a ddapps project
-  - 1.5.0
-    - (feat) Remove `token` from user API to track requests
-    - (feat) Add tracing
-    - (feat) Add `expire` on MonWatch operation
-    - (fix) Client correctly closes the WebSocket on ClientResponse
-    - (feat) Use Cliffy global options for CLI
-    - (feat) Add `--trace` on Client & CLI
-  - 1.5.1
-    - (fix) Fix ddappsctl init & other
-  - 1.5.2
-    - (fix) Fix DDAPPS product version
-  - 1.5.3
-    - (feat) Add Messenger.sendLog to send EMType.LogMessage to Logger
-    - (fix) Messenger.shutdown() correctly removeEventListener from parent classes
-  - 1.5.4
-    - (fix) Register custom components for mon watch /ddapps/node/logs
-    - (fix) Lighter client with no dependecy to DDAPPS
-  - 1.5.5
-    - (fix) Fix networking errors
-    - (feature) Add details to `Messenger.sendLog()`
-    - (improvement) Update `Logger.filters` for easier use
 - 1.3.0 Use sets, Deno 1.19 & allow client notification on requests with ops.listen()
   - 1.3.1 Add DRemotePeerSet MPayload typing
 - 1.2.0 Implement MonSet operation

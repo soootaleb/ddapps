@@ -27,7 +27,7 @@ export class DDAPPS<
 
   public static readonly PRODUCT = {
     ...Deno.version,
-    ddapps: "1.5.5",
+    ddapps: "1.5.6",
   };
 
   protected boot = ["log", "api", "mon", "peer", "net"];

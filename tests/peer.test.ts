@@ -1,4 +1,4 @@
-import { state } from "../src/state.ts";
+import { of } from "../src/state.ts";
 import { Peer } from "../src/peer.ts";
 import { EComponent } from "../src/enumeration.ts";
 import { IMessage, IState } from "../src/interface.ts";
@@ -11,7 +11,7 @@ import { DRemotePeer } from "../src/models/remotepeer.model.ts";
 const assertMessages = getAssert();
 
 Deno.test("Peer::ClientResponse", async () => {
-  const s: IState = { ...state };
+  const s: IState = of();
 
   const component = new Peer(s);
 
@@ -42,9 +42,7 @@ Deno.test("Peer::ClientResponse", async () => {
 });
 
 Deno.test("Peer::DiscoveryResult::Success", async () => {
-  const s: IState = {
-    ...state,
-  };
+  const s: IState = of();
 
   const component = new Peer(s);
 
@@ -74,9 +72,7 @@ Deno.test("Peer::DiscoveryResult::Success", async () => {
 });
 
 Deno.test("Peer::DiscoveryResult::NotSuccess", async () => {
-  const s: IState = {
-    ...state,
-  };
+  const s: IState = of();
 
   const component = new Peer(s);
 
@@ -106,9 +102,7 @@ Deno.test("Peer::DiscoveryResult::NotSuccess", async () => {
 });
 
 Deno.test("Peer::PeerConnectionOpen", async () => {
-  const s: IState = {
-    ...state,
-  };
+  const s: IState = of();
 
   s.net.peers.set("127.0.0.1-1", new DRemotePeer("127.0.0.1-1", null as unknown as WebSocket));
   s.net.peers.set("127.0.0.2-1", new DRemotePeer("127.0.0.2-1", null as unknown as WebSocket));
@@ -139,10 +133,63 @@ Deno.test("Peer::PeerConnectionOpen", async () => {
   component.shutdown();
 });
 
-/**
- * MISSING
- *
- * M - PeerConnectionOpen
- * L - PeerConnectionAccepted
- * L - CallForVoteResponse
- */
+Deno.test("Peer::PeerConnectionAccepted::NoNewPeers", async () => {
+  const s: IState = of();
+
+  const component = new Peer(s);
+
+  const message: IMessage<EMType.PeerConnectionAccepted> = {
+    type: EMType.PeerConnectionAccepted,
+    destination: EComponent.Peer,
+    payload: {
+      knownPeers: []
+    },
+    source: "Source",
+  };
+
+  await assertMessages([
+    {
+      type: EMType.LogMessage,
+      payload: {
+        message: `Peer::ReadyAfter::PeerConnectionAccepted`,
+        detail: message
+      },
+      source: EComponent.Peer,
+      destination: EComponent.Logger,
+    }
+  ], message);
+
+  assertEquals(s.ready, true);
+
+  component.shutdown();
+});
+
+Deno.test("Peer::PeerConnectionAccepted::NewPeers", async () => {
+  const s: IState = of();
+
+  s.net.peers.set("127.0.0.1-1", new DRemotePeer("127.0.0.1-1", null as unknown as WebSocket));
+
+  const component = new Peer(s);
+
+  const message: IMessage<EMType.PeerConnectionAccepted> = {
+    type: EMType.PeerConnectionAccepted,
+    destination: EComponent.Peer,
+    payload: {
+      knownPeers: ["127.0.0.1", "127.0.0.2"]
+    },
+    source: "Source",
+  };
+
+  await assertMessages([
+    {
+      type: EMType.PeerConnectionRequest,
+      payload: {
+        peerIp: "127.0.0.2",
+      },
+      source: EComponent.Peer,
+      destination: EComponent.Net,
+    }
+  ], message);
+
+  component.shutdown();
+});

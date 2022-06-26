@@ -45,7 +45,7 @@ export class Peer<
     message: M<EMType.PeerConnectionAccepted>,
   ) {
     const unknownPeers = message.payload.knownPeers
-      .filter((peer: string) => this.peers.ips.includes(peer));
+      .filter((peer: string) => !this.peers.ips.includes(peer));
 
     // If some peers are uknown and left to be connected to, do it
     if (unknownPeers.length) {

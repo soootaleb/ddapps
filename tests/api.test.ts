@@ -1,4 +1,4 @@
-import { state } from "../src/state.ts";
+import { of } from "../src/state.ts"
 import { Api } from "../src/api.ts";
 import { EComponent, EMonOpType } from "../src/enumeration.ts";
 import { IMessage, IState } from "../src/interface.ts";
@@ -11,7 +11,7 @@ import { Message } from "../src/models/message.model.ts";
 const assertMessages = getAssert();
 
 Deno.test("Api::ClientRequest::MonGet", async () => {
-  const s: IState = { ...state };
+  const s: IState = of();
 
   const component = new Api(s)
 
@@ -46,7 +46,7 @@ Deno.test("Api::ClientRequest::MonGet", async () => {
 });
 
 Deno.test("Api::ClientRequest::MonSet", async () => {
-  const s: IState = { ...state };
+  const s: IState = of();
 
   const component = new Api(s)
 
@@ -82,7 +82,7 @@ Deno.test("Api::ClientRequest::MonSet", async () => {
 
 Deno.test("Api::ClientRequest::MonWatch", async () => {
 
-  const s: IState = { ...state };
+  const s: IState = of();
   const component = new Api(s)
   const payload = {
     token: "token",
@@ -133,25 +133,16 @@ Deno.test("Api::ClientResponse", async () => {
     payload
   )
 
-  const s: IState = {
-    ...state,
-    net: {
-      ...state.net,
-      requests: {
-        "token": "127.0.0.1"
-      }
-    },
-
-    mon: {
-      ...state.mon,
-      trace: {
-        [Message.hash(message)]: {
-          notify: false,
-          token: "token"
-        }
-      }
+  const s: IState = of()
+  s.net.requests = {
+    "token": "127.0.0.1"
+  }
+  s.mon.trace = {
+    [Message.hash(message)]: {
+      notify: false,
+      token: "token"
     }
-  };
+  }
 
   const component = new Api(s)
 
@@ -169,15 +160,10 @@ Deno.test("Api::ClientResponse", async () => {
 
 Deno.test("Api::ClientNotification", async () => {
 
-  const s: IState = {
-    ...state,
-    net: {
-      ...state.net,
-      requests: {
-        "token": "127.0.0.1"
-      }
-    }
-  };
+  const s: IState = of()
+  s.net.requests = {
+    "token": "127.0.0.1"
+  }
 
   const component = new Api(s)
   const payload = {
@@ -211,17 +197,12 @@ Deno.test("Api::ClientNotification", async () => {
 
 Deno.test("Api::ClientConnectionClose", async () => {
 
-  const s: IState = {
-    ...state,
-    net: {
-      ...state.net,
-      requests: {
-        "token-1": "127.0.0.1",
-        "token-2": "127.0.0.1",
-        "token-3": "127.0.0.3"
-      }
-    }
-  };
+  const s: IState = of()
+  s.net.requests = {
+    "token-1": "127.0.0.1",
+    "token-2": "127.0.0.1",
+    "token-3": "127.0.0.3"
+  }
 
   const component = new Api(s)
 

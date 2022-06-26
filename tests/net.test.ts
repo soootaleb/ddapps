@@ -4,12 +4,12 @@ import { IMessage, IState } from "../src/interface.ts";
 import { assertEquals } from "std/testing/asserts.ts";
 import { EMType } from "../src/messages.ts";
 import { getAssert } from "../src/testing.ts";
-import { state } from "../src/state.ts";
+import { of } from "../src/state.ts";
 
 const assertMessages = getAssert();
 Deno.test("Net::InitialMessage::DiscoveryDisabled", async () => {
   
-  const s: IState = { ...state };
+  const s: IState = of();
 
   const component = new Net(s);
 
