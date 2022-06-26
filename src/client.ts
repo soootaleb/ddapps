@@ -160,7 +160,7 @@ export class Client<
     if (Object.keys(this._requests).includes(message.payload.token)) {
       this._requests[message.payload.token].resolve(message);
       delete this._requests[message.payload.token];
-      delete this._listeners[message.payload.type];
+      if (this._disconnectOnClientResponse) delete this._listeners[message.payload.type];
     } else {
       console.log(`Client::ClientResponse::Error::InvalidToken::${message.payload.token}`)
     }
