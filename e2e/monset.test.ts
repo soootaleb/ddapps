@@ -13,9 +13,12 @@ const port: number = typeof ARGS["p"] === "number" ? ARGS["p"] : 8080;
 
 Deno.test("E2E::Mon::Set", async () => {
   const ops = await new Client(addr, port).co;
+  ops.keepalive();
+
   await ops.monop(EMonOpType.Set, "/ddapps/node/state/testing/dummy", "dummy-value");
-  
   const response = await ops.monop(EMonOpType.Get, "/ddapps/node/state/testing/dummy");
+  
+  ops.disconnect()
 
   const payload = response.payload.payload as unknown as IMonOp<{ ddapps: string }>
   assertEquals(response.source, addr);

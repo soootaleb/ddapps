@@ -5,7 +5,7 @@
     "upgrade-cli": "deno task compile-cli && mv ddappsctl /usr/local/bin/ && ddappsctl -V",
     "test": "deno task test-unit && deno task test-integration && deno task test-e2e",
     "test-local": "deno task test-unit && deno task test-integration",
-    "test-e2e": "deno test --allow-all --unstable e2e -- -a 192.168.64.2",
+    "test-e2e": "deno test --allow-all --unstable e2e",
     "test-unit": "deno test --allow-all --unstable tests",
     "test-integration": "deno test --allow-all --unstable --config example/deno.json example/tests",
     "test-ci": "deno task test-unit && deno task test-integration && deno task compile-example && deno task test-init",

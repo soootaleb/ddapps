@@ -6,7 +6,6 @@ import { Peer } from "./peer.ts";
 import { EMType, IMPayload } from "./messages.ts";
 import { IRequestPayload, IResponsePayload } from "./operation.ts";
 import { DRemotePeer } from "./models/remotepeer.model.ts";
-import { DDAPPS } from "./ddapps.ts";
 
 export class Net<
   ReqPayload extends IRequestPayload = IRequestPayload,
