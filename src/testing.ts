@@ -1,8 +1,5 @@
 import { Messenger } from "./messenger.ts";
-import {
-  assertEquals,
-  assertObjectMatch,
-} from "std/testing/asserts.ts";
+import { assertEquals, assertObjectMatch } from "std/testing/asserts.ts";
 import { of } from "./state.ts";
 import { IMPayload } from "./messages.ts";
 import { IRequestPayload, IResponsePayload } from "./operation.ts";
@@ -16,9 +13,9 @@ function expect<
     ReqPayload,
     ResPayload
   >,
-  >(
-    expected: M<keyof MPayload, ReqPayload, ResPayload, MPayload>[],
-    after: M<keyof MPayload, ReqPayload, ResPayload, MPayload>,
+>(
+  expected: M<keyof MPayload, ReqPayload, ResPayload, MPayload>[],
+  after: M<keyof MPayload, ReqPayload, ResPayload, MPayload>,
 ) {
   const messages = new Messenger<
     ReqPayload,
@@ -37,15 +34,14 @@ function expect<
     const timeout = setTimeout(() => {
       removeEventListener(
         current.destination,
-        tests[current.destination + current.type],
+        tests[current.destination + current.type.toString()],
       );
       resolve(false);
     }, 1000);
 
-    tests[current.destination + current.type] = (ev: Event) => {
+    tests[current.destination + current.type.toString()] = (ev: Event) => {
       const event: CustomEvent = ev as CustomEvent;
-      const message: M<keyof MPayload, ReqPayload, ResPayload, MPayload> =
-        event.detail;
+      const message: M<keyof MPayload, ReqPayload, ResPayload, MPayload> = event.detail;
 
       if (
         message.destination === after.destination &&
@@ -66,7 +62,7 @@ function expect<
       resolve(true);
     };
 
-    addEventListener(current.destination, tests[current.destination + current.type]);
+    addEventListener(current.destination, tests[current.destination + current.type.toString()]);
   }
 
   messages.send(after.type, after.payload, after.destination, after.source);
@@ -74,14 +70,14 @@ function expect<
   return Promise.all(promises).then((ok) => {
     for (let index = 0; index < ok.length; index++) {
       if (!ok[index]) {
-        console.error(`\n🛑 ${expected[index].source}::${expected[index].destination}::${expected[index].type}`);
+        console.error(`\n🛑 ${expected[index].source}::${expected[index].destination}::${expected[index].type.toString()}`);
       }
     }
 
     for (const current of expected) {
       removeEventListener(
         current.destination,
-        tests[current.destination + current.type],
+        tests[current.destination + current.type.toString()],
       );
     }
 
@@ -101,7 +97,7 @@ export function getAssert<
     ReqPayload,
     ResPayload
   >,
-  >() {
+>() {
   return async function assertMessages(
     expected: M<keyof MPayload, ReqPayload, ResPayload, MPayload>[],
     after: M<keyof MPayload, ReqPayload, ResPayload, MPayload>,
@@ -110,7 +106,7 @@ export function getAssert<
     assertEquals(
       exp,
       -1,
-      `Testing::AssertionError::MessageNotReceived::${expected[exp]?.type}::${expected[exp]?.destination}`,
+      `Testing::AssertionError::MessageNotReceived::${expected[exp]?.type.toString()}::${expected[exp]?.destination}`,
     );
   };
 }
@@ -122,7 +118,7 @@ export function getAwaitMessages<
     ReqPayload,
     ResPayload
   >,
-  >() {
+>() {
   return function awaitMessages(
     destinations: (EComponent | string)[],
     message: M<keyof MPayload, ReqPayload, ResPayload, MPayload>,
@@ -144,8 +140,7 @@ export function getAwaitMessages<
 
     const add: (ev: Event) => void = (ev: Event) => {
       const event: CustomEvent = ev as CustomEvent;
-      const message: M<keyof MPayload, ReqPayload, ResPayload, MPayload> =
-        event.detail;
+      const message: M<keyof MPayload, ReqPayload, ResPayload, MPayload> = event.detail;
       messages.push(message);
     };
 
