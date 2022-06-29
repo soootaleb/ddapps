@@ -103,7 +103,7 @@ export class Logger<
         payload = "";
         break;
       case "partial":
-        payload = payload.substring(0, 180);
+        payload = payload.substring(0, Deno.consoleSize(Deno.stdout.rid).columns / 2);
         break;
       default:
         break;
