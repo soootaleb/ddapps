@@ -142,23 +142,23 @@ export class Messenger<
       ko = reject;
     });
 
+    const message = new Message<T, ReqPayload, ResPayload, MPayload>(type, source || this.constructor.name, d, payload)
+    const event = new CustomEvent(d, { detail: message, cancelable: true })
+
+    /**
+     * Update the traces only if there is a context (not first message) &
+     * there is a matching trace (tracing activated e.g for ClientRequest, or if a component did it on its own)
+     * 
+     * In case of a first message sent (i.e no context) its for edge cases like
+     * new Messenger().send(); // e.g for testing purpose
+     * 
+     */
+    if (this.context && this.state.mon.trace[this.context]) {
+      const hash = Message.hash(message);
+      this.state.mon.trace[hash] = this.state.mon.trace[this.context];
+    }
+
     setTimeout(() => {
-      const message = new Message<T, ReqPayload, ResPayload, MPayload>(type, source || this.constructor.name, d, payload)
-      const event = new CustomEvent(d, { detail: message, cancelable: true })
-
-      /**
-       * Update the traces only if there is a context (not first message) &
-       * there is a matching trace (tracing activated e.g for ClientRequest, or if a component did it on its own)
-       * 
-       * In case of a first message sent (i.e no context) its for edge cases like
-       * new Messenger().send(); // e.g for testing purpose
-       * 
-       */
-      if (this.context && this.state.mon.trace[this.context]) {
-        const hash = Message.hash(message);
-        this.state.mon.trace[hash] = this.state.mon.trace[this.context];
-      }
-
       const handled = dispatchEvent(event);
 
       if (handled) {
