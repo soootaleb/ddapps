@@ -4,6 +4,7 @@
 
 Initial boilerplate
 
+- 1.6.0 (fix) Fix major tracing bug when requests are handled in parallel
 - 1.5.0
   - (feat) Remove `token` from user API to track requests
   - (feat) Add tracing
