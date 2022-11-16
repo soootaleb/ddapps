@@ -146,6 +146,24 @@ jobs:
           root: ~/project/
           paths:
             - ddappsctl.tar
+  GithubRelease:
+    docker:
+      - image: cimg/base:stable-20.04
+    resource_class: small
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: "Publish Release on GitHub"
+          command: |
+            GIT_TAG=$(git tag --points-at HEAD)
+            VERSION=$([ "$GIT_TAG" == "" ] && echo "latest" || echo "$GIT_TAG")
+            echo "Tag is ${VERSION}"
+            mkdir binaries
+            cp ddapps binaries/
+            cp ddappsctl binaries/
+            ghr -t ${GITHUB_TOKEN} -u soootaleb -r ddapps -c ${CIRCLE_SHA1} -delete ${VERSION} ./binaries/
   DockerPushServer:
     docker:
       - image: cimg/base:stable-20.04
@@ -212,6 +230,15 @@ workflows:
       - DockerPackageCLI:
           requires:
             - DenoBuildCLI
+      - GithubRelease:
+          requires:
+            - DenoBuildServer
+            - DenoBuildCLI
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^\d+\.\d+\.\d+$/
       - DockerPushServer:
           requires:
             - DockerPackageServer
