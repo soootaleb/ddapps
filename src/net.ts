@@ -4,7 +4,7 @@ import { M } from "./type.ts";
 import { IMessage, IState } from "./interface.ts";
 import { Peer } from "./peer.ts";
 import { EMType, IMPayload } from "./messages.ts";
-import { IRequestPayload, IResponsePayload } from "./operation.ts";
+import { EOpType, IRequestPayload, IResponsePayload } from "./operation.ts";
 import { DRemotePeer } from "./models/remotepeer.model.ts";
 
 export class Net<
@@ -158,8 +158,17 @@ export class Net<
       }
 
       socket.onmessage = (ev: MessageEvent) => {
-        const msg = JSON.parse(ev.data) as IMessage<EMType, ReqPayload, ResPayload, MPayload>;
-        this.send(msg.type, msg.payload, EComponent.Api, hostname);
+        try {
+          const msg = JSON.parse(ev.data) as IMessage<EMType, ReqPayload, ResPayload, MPayload>;
+          if (msg.type) this.send(msg.type, msg.payload, EComponent.Api, hostname);
+          else throw new Error("MissingMessageType");
+        } catch (_) {
+          this.clients.get(hostname)?.send(EOpType.Any, {
+            error: _.message,
+            message: `Net::WebSocket::InvalidMessageFormat`,
+            data: ev.data
+          }, "N/A")
+        }
       }
 
       // TODO Use the ev.reason in payload
