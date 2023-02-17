@@ -4,6 +4,7 @@
 
 Initial boilerplate
 
+- 1.6.5: (fix) Fix mod.ts
 - 1.6.4
   - (feat) Add mon key /ddapps/node/state/keys to get state keys
   - (feat) Add docker-compose file
