@@ -40,7 +40,7 @@ export class Monitor<
       return metric
         ? full[metric] || "NoSuchMetric::" + metric
         : full;
-    } else if (key.startsWith("/ddapps/node/state/")) {
+    } else if (key.startsWith("/ddapps/node/state")) {
       const path = key.substring("/ddapps/node/state/".length);
       const keys = path.split("/");
       // deno-lint-ignore no-explicit-any
@@ -48,6 +48,8 @@ export class Monitor<
       for (const key of keys) {
         if (Object.keys(payload).includes(key)) {
           payload = payload[key];
+        } else if (key.length === 0) {
+          return payload;
         } else {
           return "NoSuchKey::" + key;
         }

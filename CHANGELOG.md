@@ -4,7 +4,8 @@
 
 Initial boilerplate
 
-- 1.6.1 (fix) Error handling on invalid messages from clients
+- 1.6.3 (feat) Add mon key /ddapps/node/state to get full state
+- 1.6.2 (fix) Error handling on invalid messages from clients
 - 1.6.1 (feat) Bump Deno 1.28
 - 1.6.0 (fix) Fix major tracing bug when requests are handled in parallel
 - 1.5.0
