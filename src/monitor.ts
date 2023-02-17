@@ -40,6 +40,8 @@ export class Monitor<
       return metric
         ? full[metric] || "NoSuchMetric::" + metric
         : full;
+    } else if (key === "/ddapps/node/state/keys") {
+      return Object.keys(this.state);
     } else if (key.startsWith("/ddapps/node/state")) {
       const path = key.substring("/ddapps/node/state/".length);
       const keys = path.split("/");

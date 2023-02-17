@@ -4,6 +4,9 @@
 
 Initial boilerplate
 
+- 1.6.4
+  - (feat) Add mon key /ddapps/node/state/keys to get state keys
+  - (feat) Add docker-compose file
 - 1.6.3 (feat) Add mon key /ddapps/node/state to get full state
 - 1.6.2 (fix) Error handling on invalid messages from clients
 - 1.6.1 (feat) Bump Deno 1.28

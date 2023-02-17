@@ -1,0 +1,37 @@
+version: "3.9"
+services:
+  alpha:
+    image: denoland/deno:1.29.4
+    working_dir: /ddapps
+    command:
+      -  deno
+      - run
+      - -A
+      - --unstable
+      - main.ts
+      - --console-messages
+      - --debug
+    environment:
+      - "DDAPPS_NODE_IP=alpha"
+      - "DDAPPS_CLUSTER_HOSTNAME=alpha"
+    volumes:
+      - .:/ddapps
+    ports:
+      - "8080:8080"
+  beta:
+    image: denoland/deno:1.29.4
+    working_dir: /ddapps
+    command:
+      -  deno
+      - run
+      - -A
+      - --unstable
+      - main.ts
+      - --discovery
+      - --console-messages
+      - --debug
+    environment:
+      - "DDAPPS_NODE_IP=beta"
+      - "DDAPPS_CLUSTER_HOSTNAME=alpha"
+    volumes:
+      - .:/ddapps
