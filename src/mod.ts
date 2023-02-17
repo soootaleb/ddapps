@@ -2,7 +2,7 @@
 export { Client } from "./client.ts";
 export { getAssert } from "./testing.ts";
 export { DDAPPS } from "./ddapps.ts";
-export { state, of } from "./state.ts";
+export { of } from "./state.ts";
 
 // Components
 export { Api } from "./api.ts";
