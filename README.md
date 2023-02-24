@@ -2,7 +2,7 @@
 
 ![CircleCI](https://circleci.com/gh/soootaleb/ddapps/tree/main.svg?style=shield)
 
-DDAPPS is an event-driven Deno framework. It's adapted to build _living_ applications (opposed to the convention request/response service) like a distributed database (see the example).
+DDAPPS is an event-driven / messages Deno framework. It's adapted to build _living_ applications (opposed to the convention request/response service) like a distributed database (see the example).
 
 - [Docker Hub - Server](https://hub.docker.com/repository/docker/soootaleb/ddapps)
 - [Docker Hub - CLI](https://hub.docker.com/repository/docker/soootaleb/ddappsctl)
